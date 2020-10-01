@@ -1,8 +1,6 @@
 from sarsa import SARSA
 from snake_game import Snake_game
-from state_to_game import StateActions
 import pygame
-import time
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 

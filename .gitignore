@@ -1,1 +1,4 @@
 /venv
+/backups
+*.pyc
+test.py
