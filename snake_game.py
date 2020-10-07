@@ -1,7 +1,6 @@
 import pygame
 import time
 import random
-from sarsa import SARSA
 from math import sqrt
 import sys
 import pdb
@@ -26,14 +25,14 @@ class Snake_game():
     
     snake_block = 10
     snake_speed = 25
-    sarsa=None
+    rl_object=None
     pygame.init()
     
     font_style = pygame.font.SysFont("comicsansms", 25)
     score_font = pygame.font.SysFont("comicsansms", 35)
     
-    def __init__(self,sarsa):
-        self.sarsa=sarsa
+    def __init__(self,rl_object):
+        self.rl_object=rl_object
 
     def Your_score(self, score):
         value = self.score_font.render("Your Score: " + str(score), True, self.yellow)
@@ -158,7 +157,7 @@ class Snake_game():
         foody = round(random.randrange(0, self.dis_height - self.snake_block) / 10.0) * 10.0
         old_state=self.get_state([x1,y1], foodx, foody, last_event_type, snake_List)
         
-        old_action=self.sarsa.epsilon_greedy(old_state, train=True)
+        old_action=self.rl_object.epsilon_greedy(old_state, train=True)
         
         while not game_over:
     
@@ -199,14 +198,14 @@ class Snake_game():
                 reward_type=1
     
             new_state=self.get_state([x1,y1], foodx, foody, old_action, snake_List)
-            new_action = self.sarsa.epsilon_greedy(new_state, train=True)
-            self.sarsa.UpdateQ(old_state, old_action, new_state, new_action, reward_type)
+            new_action = self.rl_object.epsilon_greedy(new_state, train=True)
+            self.rl_object.update_Q(old_state, old_action, new_state, new_action, reward_type)
             old_state=new_state
             old_action=new_action
             self.clock.tick(self.snake_speed)
         
 
-        self.sarsa.UpdateQ(old_state, old_action, None, None, reward_type)
+        self.rl_object.update_Q(old_state, old_action, None, None, reward_type)
         
         pygame.QUIT
         return Length_of_snake - 1

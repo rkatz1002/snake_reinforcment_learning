@@ -1,23 +1,43 @@
+from algorithms.sarsa import sarsa
+from algorithms.monte_carlo import monte_carlo
 import numpy as np
-from tqdm import tqdm
 
-class SARSA():
+class RL():
 
-    """
-    Implements SARSA
-    """
-
-    alpha = 0.1
-    gamma = 0.95
     epsilon = 0.95
     Q={}
     reward_eat_food = 500
     reward_loose = - 500
     reward_do_nothing = - 10
-    reward_do_nothing_go_further_away= - 15
+    reward_do_nothing_go_further_away= - 50
+    algorithm="SARSA"
 
-    def init_q(self, type="zeros"):        
+    def __init__(self, algorithm):
+        self.algorithm=algorithm
+        if self.algorithm == "MONTE CARLO":
+            self.returns={}
+            for ws in [False,True]:
+                self.returns[ws]={}
+                for wl in [False,True]:
+                    self.returns[ws][wl]={}
+                    for wr in [False,True]:
+                        self.returns[ws][wl][wr]={}
+                        for direction in ['0', '1', '2', '3']:
+                            self.returns[ws][wl][wr][direction]={}
+                            for is_left in [False,True]:
+                                self.returns[ws][wl][wr][direction][is_left]={}                        
+                                for is_up in [False,True]:    
+                                    self.returns[ws][wl][wr][direction][is_left][is_up]=[]
         
+    def init_q(self, type="zeros"):        
+
+        """
+            This function starts the Q table of reinforcment learning.
+            If the argument type=None, all elements will be zeros.
+            If the kwarg type is ones, all elements of the Q table will
+            be ones. 
+        """
+
         if type=="ones":
             val=1
         elif type=="zeros":
@@ -43,11 +63,9 @@ class SARSA():
             L = np.argsort(-np.array(x))
             top_n_2 = L[1]
             return top_n_2
+
         """
-        @param Q Q values state x action -> value
-        @param epsilon for exploration
-        @param s number of states
-        @param train if true then no random actions selected
+            policy epsilon greedy. Epsilon is defined in the class.
         """
 
         if train or np.random.rand() < self.epsilon:
@@ -90,7 +108,13 @@ class SARSA():
 
         return action
     
-    def write_rewards_to_file(self):
+    def write_q_table(self):
+
+        """
+            Will right the q table to txt file
+            so user can run code whenever needed.
+        """
+
         with open('rewards.txt', 'w') as file:
             for ws in self.Q:
                 for wl in self.Q[ws]:
@@ -103,7 +127,13 @@ class SARSA():
                                     file.write("\n")                                
             file.close()
 
-    def read_rewards_to_file(self):
+    def read_q_table(self):
+        
+        """
+            read q table from file
+            so user can run code whenever needed.
+        """
+        
         with open('rewards.txt', 'r') as file:
             for ws in self.Q:
                 for wl in self.Q[ws]:
@@ -116,44 +146,43 @@ class SARSA():
                                     del line[-1]
                                     line=[float(numb) for numb in line]
                                     self.Q[ws][wl][wr][direction][is_left][is_up]=line
-            file.close()    
-            
-    def UpdateQ(self, state, action, state_, action_, reward_type):
+            file.close()
+
+    def update_Q(self, state, action, new_state, new_action, reward_type):
         
-        def map_type_to_val():
-            if reward_type==1:
-                return self.reward_eat_food
-            
-            elif reward_type==2:
-                return self.reward_loose
-                
-            elif reward_type==3:
-                return self.reward_do_nothing
-
-            elif reward_type==4:
-                return self.reward_do_nothing_go_further_away
-
-        reward=map_type_to_val()
-        q = self.Q[state[0]][state[1]]\
-                [state[2]][str(state[3])]\
-                [True if state[4]<0 else False]\
-                [True if state[5]<0 else False]\
-                [action]
+        if self.algorithm=="SARSA":
         
-        if state_ is not None:
-            q_=self.Q[state_[0]][state_[1]]\
-            [state_[2]][str(state_[3])]\
-            [True if state_[4]<0 else False]\
-            [True if state_[5]<0 else False]\
-            [action_]
-        else:
-            q_=0
+            self.Q=sarsa(
+                Q=self.Q,
+                reward_eat_food=self.reward_eat_food,
+                reward_loose=self.reward_loose,
+                reward_do_nothing=self.reward_do_nothing,
+                reward_do_nothing_go_further_away=self.reward_do_nothing_go_further_away,
+                state=state,
+                action=action,
+                state_=new_state,
+                action_=new_action,
+                reward_type=reward_type,
+                gamma=0.95,
+                alpha=0.1
+            )
 
-        q += self.alpha * (reward + self.gamma * q_ - q)
-
-        self.Q[state[0]][state[1]]\
-        [state[2]][str(state[3])]\
-        [True if state[4]<0 else False]\
-        [True if state[5]<0 else False]\
-        [action] = q
-
+        elif self.algorithm == "MONTE CARLO":
+        
+            self.G = 0
+            
+            self.Q=monte_carlo(
+                Q=self.Q,
+                reward_eat_food=self.reward_eat_food,
+                reward_loose=self.reward_loose,
+                reward_do_nothing=self.reward_do_nothing,
+                reward_do_nothing_go_further_away=self.reward_do_nothing_go_further_away,
+                state=state,
+                action=action,
+                state_=new_state,
+                action_=new_action,
+                reward_type=reward_type,
+                gamma=0.95,
+                returns=self.returns,
+                G=self.G
+            )
