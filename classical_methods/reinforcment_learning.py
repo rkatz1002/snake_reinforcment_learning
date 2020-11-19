@@ -6,7 +6,7 @@ class RL():
 
     epsilon = 0.95
     Q={}
-    reward_eat_food = 500
+    reward_eat_food = 100
     reward_loose = - 500
     reward_do_nothing = - 10
     reward_do_nothing_go_further_away= - 50

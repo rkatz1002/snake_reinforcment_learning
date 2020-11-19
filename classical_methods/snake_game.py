@@ -3,7 +3,6 @@ import time
 import random
 from math import sqrt
 import sys
-import pdb
 
 #https://www.edureka.co/blog/snake-game-with-pygame/
 
@@ -108,7 +107,7 @@ class Snake_game():
         self.dis.blit(mesg, [self.dis_width / 6, self.dis_height / 3])
     
     def step(self, x1, y1, snake_List,Length_of_snake,foodx,foody,old_action):
-        
+
         if old_action == 0: #left
             x1_change = -self.snake_block
             y1_change = 0
