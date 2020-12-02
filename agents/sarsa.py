@@ -4,16 +4,6 @@ class Sarsa():
 
     #q table
     Q={}
-
-    #rewards
-    reward_eat_food = 100
-    reward_loose = -500
-    reward_do_nothing = -10
-    reward_do_nothing_go_further_away= -50
-    # reward_eat_food = 100
-    # reward_loose = - 500
-    # reward_do_nothing = - 10
-    # reward_do_nothing_go_further_away= - 50
     
     #parameters
     alpha=0.1
@@ -49,20 +39,12 @@ class Sarsa():
                             for fs in [False, True]:
                                 self.Q[ws][wl][wr][fr][fl][fs]={}
                                 for direction in [0, 1, 2, 3]:
-                                    self.Q[ws][wl][wr][fr][fl][fs][direction]=[val, val, val, val]
+                                    self.Q[ws][wl][wr][fr][fl][fs][direction]=[val, val, val]
     def get_act(self, s, train=True):
         
         """
             policy epsilon greedy. Epsilon is defined in the class.
         """
-
-        def argmaxsecond(x):
-            """
-                Gets position of second biggest argument.
-            """
-            L = np.argsort(-np.array(x))
-            top_n_2 = L[1]
-            return top_n_2
 
         if train or np.random.rand() < self.epsilon:
             action = np.argmax(
@@ -76,34 +58,8 @@ class Sarsa():
                         [s[6]]
                     )
         else:
-            action = np.random.randint(0, 4)
-        
-        direction=s[6]
-
-        #Make sure snake doesnt go backwards
-
-        if (direction==0 and action==1) or\
-        (direction==1 and action==0) or\
-        (direction==2 and action==3) or\
-        (direction==3 and action==2):
-            if train or np.random.rand() < self.epsilon:
-                action = argmaxsecond(
-                        self.Q[s[0]][s[1]]\
-                            [s[2]][s[3]]\
-                            [s[4]][s[5]]\
-                            [s[6]]
-                        )
-            else:
-                will_go_backwars=True
-                while will_go_backwars:
-                    action = np.random.randint(0, 4)
-                    will_go_backwars=False
-                    if (direction==0 and action==1) or\
-                    (direction==1 and action==0) or\
-                    (direction==2 and action==3) or\
-                    (direction==3 and action==2):
-                        will_go_backwars=True
-
+            action = np.random.randint(0, 3)
+    
         return action
     
     def write_q_table(self):
@@ -154,38 +110,20 @@ class Sarsa():
             action, 
             state_, 
             action_, 
-            reward_type
+            reward
         ):
 
         def sarsa(
-                Q, 
-                reward_eat_food,
-                reward_loose,
-                reward_do_nothing,
-                reward_do_nothing_go_further_away, 
+                Q,
                 state, 
                 action, 
                 state_, 
                 action_, 
-                reward_type,
+                reward,
                 gamma,
                 alpha
             ):
         
-            def map_type_to_val():
-                if reward_type==1:
-                    return reward_eat_food
-                
-                elif reward_type==2:
-                    return reward_loose
-                    
-                elif reward_type==3:
-                    return reward_do_nothing
-
-                elif reward_type==4:
-                    return reward_do_nothing_go_further_away
-
-            reward=map_type_to_val()
 
             q = Q[state[0]][state[1]]\
                 [state[2]][state[3]]\
@@ -211,15 +149,11 @@ class Sarsa():
 
         self.Q=sarsa(
             Q=self.Q,
-            reward_eat_food=self.reward_eat_food,
-            reward_loose=self.reward_loose,
-            reward_do_nothing=self.reward_do_nothing,
-            reward_do_nothing_go_further_away=self.reward_do_nothing_go_further_away,
             state=state,
             action=action,
             state_=state_,
             action_=action_,
-            reward_type=reward_type,
+            reward=reward,
             gamma=self.gamma,
             alpha=self.alpha
         )

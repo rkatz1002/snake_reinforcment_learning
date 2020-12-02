@@ -1,69 +1,41 @@
 import pygame
 from enviorment import Snake_game
 from tqdm import tqdm
-from helper.plot import plot
-from helper.write_scores import write_scores
+from helper.write_data import write_data
+from exec_implementations import exec_implementations
+from exec_stable_baseline import exec_stable_baseline
 
 def main():
 
-    MAX_NUMBER_OF_STEPS=-1
-    MAX_NUMBER_OF_EPISODES=10000
-    n_episodes=0
     type_of_agent=-1
-    scores=[]
 
-    while type_of_agent not in [1,2,3]:
+    while type_of_agent not in [1,2,3,4,5,6]:
         print("What agent are we going to use?")
-        print("1:                        Sarsa")
-        print("2:                   Q Learning")
-        print("3:              Deep Q Learning")
+        print("1:                                      Sarsa")
+        print("2:                                 Q Learning")
+        print("3:                            Deep Q Learning")
+        print("4:                Advantage Actor-Critic(A2C)")
+        print("5:       Proximal Policy Optimization 1(PPO1)")
+        print("6:       Proximal Policy Optimization 2(PPO2)")
 
         type_of_agent = int(input())
 
-    if type_of_agent==1:
-        from agents.sarsa import Sarsa
-        agent=Sarsa()
-        file_name='Sarsa'
-    elif type_of_agent==2: #TODO
-        file_name='QLearning'
-        pass 
-        
-    elif type_of_agent==3:
-        from agents.deep_q_learning import DQN
-        file_name='DeepQLearning'
-        agent= DQN()
+    if type_of_agent in [1,2,3]:
+        total_rewards, scores, file_name=exec_implementations(type_of_agent)
     
-    for n_episodes in tqdm(range(MAX_NUMBER_OF_EPISODES)):
-        
-        game = Snake_game()
+    elif type_of_agent in [4,5,6]:
+        total_rewards, scores, file_name=exec_stable_baseline(type_of_agent)
 
-        n_steps=0
-        game_over = False
-        
-        action=0
-        action_=0
-        state=game.get_state(action)
-        
-        while not game_over and n_steps!=MAX_NUMBER_OF_STEPS:
-
-            n_steps+=1
-
-            state_, game_over, reward_type = game.step(action_)
-
-            action=action_
-            action_ = agent.get_act(state_)
-
-            agent.update(state, action, state_, action_, reward_type)
-
-            state=state_
-
-        scores.append(game.Length_of_snake)
-        pygame.QUIT
-        del game
-    
-    plot(scores)
+    for total_reward in total_rewards:
+        write_data(
+            file_name+'_'+'total_rewards',
+            total_reward
+        )
     for score in scores:
-        write_scores(file_name, score)
+        write_data(
+            file_name+'_'+'score',
+            score
+        )
 
 
 main()

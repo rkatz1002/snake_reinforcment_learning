@@ -12,14 +12,8 @@ class DQN:
 
     """ Deep Q Network """
     
-    #rewards
-    reward_do_nothing_go_further_away=-2
-    reward_loose=-100
-    reward_do_nothing=1
-    reward_eat_food=10
-    
     #parameters
-    action_space = 4 #number of actions
+    action_space = 3 #number of actions
     state_space = 7  #number of states
     epsilon = 1
     gamma = 0.95
@@ -27,7 +21,7 @@ class DQN:
     epsilon_min = 0.01
     epsilon_decay = 0.5 
     learning_rate = 0.00025
-    layer_sizes = [128, 128, 128]
+    layer_sizes = [256, 256, 256]
 
     def __init__(self):
         
@@ -37,25 +31,6 @@ class DQN:
         
         self.memory = deque(maxlen=2500)
         self.model = self.build_model()
-
-
-    def map_type_to_val(self, reward_type):
-        
-        """
-            Map the type of reward to the value of the reward.
-        """
-
-        if reward_type==1:
-            return self.reward_eat_food
-        
-        elif reward_type==2:
-            return self.reward_loose
-            
-        elif reward_type==3:
-            return self.reward_do_nothing
-
-        elif reward_type==4:
-            return self.reward_do_nothing_go_further_away
 
     def build_model(self):
 
@@ -76,12 +51,12 @@ class DQN:
         return model
 
 
-    def remember(self, state, action, reward_type, next_state):
+    def remember(self, state, action, reward, next_state):
+        
         """
             Store NN results.
         """
-        reward=self.map_type_to_val(reward_type)
-        
+                
         np_state = np.reshape(np.array(state),(1,7))
         np_next_state = np.reshape(np.array(next_state),(1,7))
 
@@ -94,28 +69,15 @@ class DQN:
             Get best action from NN.
         """
 
-        def argmaxsecond(x):
-            L = np.argsort(-np.array(x))
-            top_n_2 = L[1]
-            return top_n_2
-        
         np_state = np.reshape(np.array(state),(1,7))
         
-        if np.random.rand() <= self.epsilon:
+        #epsilon greeedy policy
+
+        if np.random.rand() <= self.epsilon: 
             return random.randrange(self.action_space)
+        
         act_values = self.model.predict(np_state)
-        direction = np_state[-1][-1]
-
         action = np.argmax(act_values[0])
-        action_2 = argmaxsecond(act_values[0])
-
-        #Make sure snake doesnt go backwards
-
-        if (direction==0 and action==1) or\
-        (direction==1 and action==0) or\
-        (direction==2 and action==3) or\
-        (direction==3 and action==2):
-            action=action_2
         
         return action
 
@@ -153,6 +115,6 @@ class DQN:
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
-    def update(self,state,action,state_,action_,reward_type):
-        self.remember(state,action,reward_type,state_)
+    def update(self,state,action,state_,action_,reward):
+        self.remember(state,action,reward,state_)
         self.replay()
