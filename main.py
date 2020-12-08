@@ -3,13 +3,17 @@ from enviorment import Snake_game
 from tqdm import tqdm
 from helper.write_data import write_data
 from exec_implementations import exec_implementations
-from exec_stable_baseline import exec_stable_baseline
+# from exec_stable_baseline import exec_stable_baseline
+import sys
 
 def main():
-
-    type_of_agent=-1
+    try:
+        type_of_agent=int(sys.argv[-1])
+    except:
+        type_of_agent=-1
 
     while type_of_agent not in [1,2,3,4,5,6]:
+        print("=============================================")
         print("What agent are we going to use?")
         print("1:                                      Sarsa")
         print("2:                                 Q Learning")
@@ -17,6 +21,7 @@ def main():
         print("4:                Advantage Actor-Critic(A2C)")
         print("5:       Proximal Policy Optimization 1(PPO1)")
         print("6:       Proximal Policy Optimization 2(PPO2)")
+        print("=============================================")
 
         type_of_agent = int(input())
 

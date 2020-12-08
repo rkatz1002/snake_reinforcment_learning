@@ -17,11 +17,12 @@ class DQN:
     state_space = 7  #number of states
     epsilon = 1
     gamma = 0.95
-    batch_size = 500
+    batch_size = 512
     epsilon_min = 0.01
-    epsilon_decay = 0.5 
-    learning_rate = 0.00025
-    layer_sizes = [256, 256, 256]
+    epsilon_decay = 0.9 
+    learning_rate = 1e-6
+    layer_sizes = [128, 128, 128]
+    memory_length=10000
 
     def __init__(self):
         
@@ -29,7 +30,7 @@ class DQN:
             Starts model and memory
         """
         
-        self.memory = deque(maxlen=2500)
+        self.memory = deque(maxlen=self.memory_length)
         self.model = self.build_model()
 
     def build_model(self):

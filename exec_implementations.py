@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 def exec_implementations(
         type_of_agent,
-        MAX_NUMBER_OF_STEPS=1000,
+        MAX_NUMBER_OF_STEPS=10000,
         MAX_NUMBER_OF_EPISODES=100,
         NUMBER_OF_UPDATE_STEPS=1
     ):
@@ -18,8 +18,9 @@ def exec_implementations(
         file_name='Sarsa'
 
     elif type_of_agent==2: #TODO
+        from agents.q_learning import QLearning
+        agent=QLearning()
         file_name='QLearning'
-        quit()
         
     elif type_of_agent==3:
         from agents.deep_q_learning import DQN
