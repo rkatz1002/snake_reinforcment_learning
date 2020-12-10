@@ -3,7 +3,7 @@ from enviorment import Snake_game
 from tqdm import tqdm
 from helper.write_data import write_data
 from exec_implementations import exec_implementations
-# from exec_stable_baseline import exec_stable_baseline
+from exec_stable_baseline import exec_stable_baseline
 import sys
 
 def main():
@@ -11,6 +11,16 @@ def main():
         type_of_agent=int(sys.argv[-1])
     except:
         type_of_agent=-1
+    
+    try:
+        train=str(sys.argv[1])
+        if train=='--not-train':
+            train=False
+        elif train=='--train':
+            train=True
+    except:
+        train=True
+
 
     while type_of_agent not in [1,2,3,4,5,6]:
         print("=============================================")
@@ -25,11 +35,11 @@ def main():
 
         type_of_agent = int(input())
 
-    if type_of_agent in [1,2,3]:
-        total_rewards, scores, file_name=exec_implementations(type_of_agent)
+    if type_of_agent in [1,2]:
+        total_rewards, scores, file_name=exec_implementations(type_of_agent, train)
     
-    elif type_of_agent in [4,5,6]:
-        total_rewards, scores, file_name=exec_stable_baseline(type_of_agent)
+    elif type_of_agent in [3,4,5,6]:
+        total_rewards, scores, file_name=exec_stable_baseline(type_of_agent, train)
 
     for total_reward in total_rewards:
         write_data(
