@@ -5,7 +5,7 @@ from stable_baselines.bench.monitor import Monitor
 def exec_stable_baseline(
         type_of_agent,
         train,
-        TRAIN_MAX_NUMBER_OF_STEPS=10000,
+        TRAIN_MAX_NUMBER_OF_STEPS=17500,
         EVAL_MAX_NUMBER_OF_STEPS=2000,
         EVAL_MAX_NUMBER_OF_EPISODES=10,
         EVAL_NUMBER_OF_UPDATE_STEPS=1,
@@ -20,10 +20,11 @@ def exec_stable_baseline(
         if train:
             model = DQN(
                 'MlpPolicy', 
-                env
+                env,
+                double_q=True
             ).learn(
                 total_timesteps=TRAIN_MAX_NUMBER_OF_STEPS, 
-                rest_num_timesteps=False
+                # reset_num_timesteps=False
             )
             model.save("stable_baseline_data\\dqn_snake")
         else:

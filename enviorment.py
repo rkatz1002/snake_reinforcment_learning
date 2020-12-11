@@ -39,9 +39,9 @@ class Snake_game(gym.Env):
 
     #rewards
     reward_eat_food = 0.5
-    reward_loose = -1                        #if snake gets closer to apple
-    reward_do_nothing = 0.01                 #if snake gets closer to apple
-    reward_do_nothing_go_further_away= -0.2  #if snake goes further away
+    reward_loose = -1                         #if snake gets closer to apple
+    reward_do_nothing = 0.05                  #if snake gets closer to apple
+    reward_do_nothing_go_further_away=  -0.05 #if snake goes further away
 
     #gym env configs
     action_space = spaces.Discrete(3)
